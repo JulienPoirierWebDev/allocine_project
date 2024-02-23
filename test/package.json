@@ -1,0 +1,23 @@
+{
+  "name": "mon_super_test",
+  "version": "1.0.0",
+  "description": "Un test de npm init",
+  "main": "hello.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon hello.js"
+  },
+  "keywords": [
+    "test",
+    "noob",
+    "hello"
+  ],
+  "author": "Julien POIRIER",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
