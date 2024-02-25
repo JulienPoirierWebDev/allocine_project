@@ -1,14 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 mongoose.connect(
   "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/allocine"
 );
 
 const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   photo: String,
   biography: String,
   role: String,
@@ -35,7 +36,7 @@ const movieListSchema = new mongoose.Schema({
   movies: [
     {
       id: { type: mongoose.Schema.Types.ObjectId, ref: "Movie" },
-      status: enum[("a voir", "pas vu")],
+      status: { type: String, enum: ["watched", "to-watch", "favorite"] },
     },
   ],
 });
@@ -43,6 +44,34 @@ const movieListSchema = new mongoose.Schema({
 const MovieList = mongoose.model("MovieList", movieListSchema);
 
 const app = express();
+
+app.use(express.json());
+
+app.post("/api/users", async (req, res) => {
+  const user = new User(req.body);
+
+  const existingUser = await User.findOne({
+    email: req.body.email,
+  });
+
+  if (existingUser) {
+    return res.status(400).json({
+      message: "Un utilisateur avec cette adresse email existe déjà",
+      error: true,
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  user.password = hashedPassword;
+
+  user.role = "user";
+
+  const userWithoutPassword = user.toObject();
+  delete userWithoutPassword.password;
+
+  await user.save();
+  res.json({ message: "ok", data: userWithoutPassword });
+});
 
 app.get("/api/movies/search_by_name", async (req, res) => {
   const movieName = req.query.name;
