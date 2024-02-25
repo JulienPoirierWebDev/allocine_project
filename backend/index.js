@@ -2,8 +2,45 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 mongoose.connect(
-  "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/"
+  "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/allocine"
 );
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  photo: String,
+  biography: String,
+  role: String,
+});
+
+const User = mongoose.model("User", userSchema);
+
+const movieSchema = new mongoose.Schema({
+  TMDBId: Number,
+  title: String,
+  year: Number,
+  poster: String,
+  description: String,
+  category: String,
+  director: String,
+  duration: Number,
+  rating: Number,
+});
+
+const Movie = mongoose.model("Movie", movieSchema);
+
+const movieListSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  movies: [
+    {
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "Movie" },
+      status: enum[("a voir", "pas vu")],
+    },
+  ],
+});
+
+const MovieList = mongoose.model("MovieList", movieListSchema);
 
 const app = express();
 
