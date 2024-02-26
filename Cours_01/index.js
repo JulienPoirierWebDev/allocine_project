@@ -3,6 +3,8 @@ const express = require("express");
 // Importer le module Mongoose pour interagir avec MongoDB
 const mongoose = require("mongoose");
 
+const bcrypt = require("bcrypt");
+
 // Créer une instance d'application Express
 const app = express();
 
@@ -56,11 +58,13 @@ app.post("/api/users/create", async (request, response) => {
     return response.json({ message: "L'email est déjà utilisée", error: true });
   }
 
+  const hashedPassword = await bcrypt.hash(request.body.password, 10);
+
   // Créer un nouvel utilisateur
   const newUser = new Users({
     name: request.body.name,
     email: request.body.email,
-    password: request.body.password,
+    password: hashedPassword,
   });
 
   // Sauvegarder le nouvel utilisateur dans la base de données
