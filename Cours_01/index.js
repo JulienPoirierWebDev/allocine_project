@@ -163,33 +163,35 @@ app.delete("/api/users/delete/:id", async (request, response) => {
   }
 });
 
-// Route pour la connexion
+// Route pour la connexion ###################################################################################################################################################
 app.post("/api/users/login", async (request, response) => {
-    // Vérifier si les données requises sont présentes
-    if (!request.body.email || !request.body.password) {
-      return response.json({
-        message: "Il manque l'une des données",
-        error: true,
-      });
-    }
-  
-    // Rechercher l'utilisateur par email
-    const user = await Users.findOne({ email: request.body.email });
-  
-    if (!user) {
-      return response.json({ message: "Utilisateur non trouvé", error: true });
-    }
-  
-    // Comparer le mot de passe fourni avec le mot de passe haché stocké
-    const isMatch = await bcrypt.compare(request.body.password, user.password);
-  
-    if (!isMatch) {
-      return response.json({ message: "Mot de passe incorrect", error: true });
-    }
-  
-    // Si tout est correct, renvoyer un message de succès
-    response.json({ message: "Connexion réussie", user: user });
-  });
+  // Vérifier si les données requises sont présentes
+  if (!request.body.email || !request.body.password) {
+    return response.json({
+      message: "Il manque l'une des données",
+      error: true,
+    });
+  }
+
+  // Rechercher l'utilisateur par email
+  const user = await Users.findOne({ email: request.body.email });
+
+  if (!user) {
+    return response.json({ message: "Utilisateur non trouvé", error: true });
+  }
+
+  // Comparer le mot de passe fourni avec le mot de passe haché stocké
+  const isMatch = await bcrypt.compare(request.body.password, user.password);
+
+  if (!isMatch) {
+    return response.json({ message: "Mot de passe incorrect", error: true });
+  }
+
+  // Si tout est correct, renvoyer un message de succès
+  response.json({ message: "Connexion réussie", user: user });
+});
+
+//   ######################################################################################################################################################################
 
 // Démarrer le serveur sur le port  3001
 app.listen("3001", (err) => {
