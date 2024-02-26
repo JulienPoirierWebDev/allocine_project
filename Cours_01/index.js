@@ -41,7 +41,7 @@ app.use(express.json());
 // Configurer Express pour accepter les données de formulaire HTML
 app.use(express.urlencoded({ extended: false }));
 
-// Route pour créer un nouvel utilisateur ##########################################################################################################################
+// Route pour créer un nouvel utilisateur
 app.post("/api/users/create", async (request, response) => {
   // Vérifier si les données requises sont présentes
   if (!request.body.email || !request.body.name || !request.body.password) {
@@ -58,9 +58,12 @@ app.post("/api/users/create", async (request, response) => {
     return response.json({ message: "L'email est déjà utilisée", error: true });
   }
 
+  // Utiliser bcrypt pour hacher le mot de passe de l'utilisateur
+  // Le deuxième argument est le "saltRounds", qui est le nombre de fois que le mot de passe sera haché
+  // Un nombre plus élevé rend le hachage plus sécurisé mais aussi plus lent
   const hashedPassword = await bcrypt.hash(request.body.password, 10);
 
-  // Créer un nouvel utilisateur
+  // Créer un nouvel utilisateur avec le mot de passe haché
   const newUser = new Users({
     name: request.body.name,
     email: request.body.email,
