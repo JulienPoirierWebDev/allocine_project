@@ -120,14 +120,12 @@ function Nutrition() {
     </>
   )
 }
-
 // ###########################################################################################################################################################################
 function App() {
 
   return (
-    <>
-      <div className="container-fluid py-5 px-5" style={{ width: "auto" }}>
-        <div className="container rounded-5 py-5" style={{ backgroundColor: "white", width: "60rem" }}>
+    <>      
+        <div className="container rounded-5 py-5 my-5" style={{ backgroundColor: "white", width: "60rem" }}>
           <div className="container px-5">
           <img src="./src/assets/images/image-omelette.jpeg" className="img-fluid rounded-5" alt="" />
           {/* ############################################################################################################################################### */}
@@ -142,8 +140,7 @@ function App() {
           <Nutrition/>
           {/* ############################################################################################################################################### */}
           </div>
-        </div>
-      </div>
+        </div>      
     </>
   )
 }
