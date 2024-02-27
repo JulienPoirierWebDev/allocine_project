@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 
 const bcrypt = require("bcrypt");
 
+const jwt = require("jsonwebtoken");
+
 // Créer une instance d'application Express
 const app = express();
 
@@ -13,7 +15,7 @@ const dbConnexion = async () => {
   try {
     // Se connecter à la base de données MongoDB
     await mongoose.connect(
-      "mongodb+srv://visothyouksim:S0n4-g12@cluster0.bt5qjav.mongodb.net/crud-mongoose"
+      "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/visoth"
     );
 
     console.log("DB Connexion succeed");
@@ -187,8 +189,10 @@ app.post("/api/users/login", async (request, response) => {
     return response.json({ message: "Mot de passe incorrect", error: true });
   }
 
+  const token = jwt.sign({ userId: user._id }, "ceci est le secret");
+
   // Si tout est correct, renvoyer un message de succès
-  response.json({ message: "Connexion réussie", user: user });
+  response.json({ message: "Connexion réussie", jwt: token });
 });
 
 //   ######################################################################################################################################################################
