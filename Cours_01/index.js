@@ -53,6 +53,8 @@ const middlewareAuth = (request, response, next) => {
     const isVerifyToken = jwt.verify(token, process.env.JWT_SECRET);
 
     if (isVerifyToken) {
+      const payload = jwt.decode(token);
+      request.userId = payload.userId;
       next();
     } else {
       response.json({ message: "bad auth", error: true });
@@ -173,6 +175,13 @@ app.delete(
   async (request, response) => {
     try {
       const { id } = request.params;
+
+      if (id !== request.userId) {
+        response.json({
+          message: "Vous n'avez pas les droits sur cette utilisateur",
+          error: true,
+        });
+      }
       const result = await Users.findByIdAndDelete(id);
 
       if (!result) {
