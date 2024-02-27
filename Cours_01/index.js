@@ -3,6 +3,25 @@ const express = require("express");
 // Importer le module Mongoose pour interagir avec MongoDB
 const mongoose = require("mongoose");
 
+const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+    const token = req.headers['x-access-token'];
+  
+    if (!token) {
+      return res.status(403).json({ message: "Un token est requis" });
+    }
+  
+    try {
+      const decoded = jwt.verify(token, 'your_secret_key');
+      req.user = decoded;
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid Token" });
+    }
+  
+    return next();
+  };
+
 const bcrypt = require("bcrypt");
 
 // Créer une instance d'application Express
@@ -80,6 +99,19 @@ app.post("/api/users/create", async (request, response) => {
 });
 
 // Route pour récupérer tous les utilisateurs ####################################################################################################################
+
+// app.get('/api/users', verifyToken, async (request, response) => {
+//     try {
+//       const users = await Users.find({});
+//       response.json(users);
+//     } catch (error) {
+//       response.status(500).json({
+//         message: "Erreur lors de la récupération des utilisateurs",
+//         error: true,
+//       });
+//     }
+//   });
+
 app.get("/api/users", async (request, response) => {
   try {
     const users = await Users.find({});
@@ -187,8 +219,13 @@ app.post("/api/users/login", async (request, response) => {
     return response.json({ message: "Mot de passe incorrect", error: true });
   }
 
-  // Si tout est correct, renvoyer un message de succès
-  response.json({ message: "Connexion réussie", user: user });
+  // Générer un token JWT
+  const token = jwt.sign({ id: user._id }, "your_secret_key", {
+    expiresIn: "1h",
+  });
+
+  // Si tout est correct, renvoyer un message de succès avec le token
+  response.json({ message: "Connexion réussie", user: user, token: token });
 });
 
 //   ######################################################################################################################################################################
