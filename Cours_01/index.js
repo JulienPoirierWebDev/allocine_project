@@ -41,6 +41,27 @@ const userSchema = mongoose.Schema({
 // Créer un modèle Mongoose basé sur le schéma défini
 const Users = mongoose.model("Users", userSchema);
 
+// middlewareAuth est extrait pour l'utiliser dans d'autres routes
+const middlewareAuth = (request, response, next) => {
+  try {
+    const token = request.body.jwt;
+
+    if (!token) {
+      response.json({ message: "bad auth", error: true });
+    }
+
+    const isVerifyToken = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (isVerifyToken) {
+      next();
+    } else {
+      response.json({ message: "bad auth", error: true });
+    }
+  } catch (error) {
+    response.json({ message: "bad auth", error: true });
+  }
+};
+
 // Configurer Express pour accepter les corps de requêtes JSON
 app.use(express.json());
 // Configurer Express pour accepter les données de formulaire HTML
@@ -148,25 +169,7 @@ app.put("/api/users/update/:id", async (request, response) => {
 // Route pour supprimer un utilisateur par ID #########################################################################################################################
 app.delete(
   "/api/users/delete/:id",
-  (request, response, next) => {
-    try {
-      const token = request.body.jwt;
-
-      if (!token) {
-        response.json({ message: "bad auth", error: true });
-      }
-
-      const isVerifyToken = jwt.verify(token, process.env.JWT_SECRET);
-
-      if (isVerifyToken) {
-        next();
-      } else {
-        response.json({ message: "bad auth", error: true });
-      }
-    } catch (error) {
-      response.json({ message: "bad auth", error: true });
-    }
-  },
+  middlewareAuth,
   async (request, response) => {
     try {
       const { id } = request.params;
