@@ -1,3 +1,6 @@
+// initialiser les variables d'environnement pour les rendre disponible
+require("dotenv").config();
+
 // Importer le module Express pour créer un serveur web
 const express = require("express");
 // Importer le module Mongoose pour interagir avec MongoDB
@@ -189,7 +192,7 @@ app.post("/api/users/login", async (request, response) => {
     return response.json({ message: "Mot de passe incorrect", error: true });
   }
 
-  const token = jwt.sign({ userId: user._id }, "ceci est le secret");
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
   // Si tout est correct, renvoyer un message de succès
   response.json({ message: "Connexion réussie", jwt: token });
