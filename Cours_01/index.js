@@ -18,7 +18,7 @@ const dbConnexion = async () => {
   try {
     // Se connecter à la base de données MongoDB
     await mongoose.connect(
-      "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/visoth"
+      "mongodb+srv://visothyouksim:S0n4-g12@cluster0.bt5qjav.mongodb.net/"
     );
 
     console.log("DB Connexion succeed");
