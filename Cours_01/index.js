@@ -146,27 +146,49 @@ app.put("/api/users/update/:id", async (request, response) => {
 });
 
 // Route pour supprimer un utilisateur par ID #########################################################################################################################
-app.delete("/api/users/delete/:id", async (request, response) => {
-  try {
-    const { id } = request.params;
-    const result = await Users.findByIdAndDelete(id);
+app.delete(
+  "/api/users/delete/:id",
+  (request, response, next) => {
+    try {
+      const token = request.body.jwt;
 
-    if (!result) {
-      return response
-        .status(404)
-        .json({ message: "Utilisateur non trouvé", error: true });
+      if (!token) {
+        response.json({ message: "bad auth", error: true });
+      }
+
+      const isVerifyToken = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (isVerifyToken) {
+        next();
+      } else {
+        response.json({ message: "bad auth", error: true });
+      }
+    } catch (error) {
+      response.json({ message: "bad auth", error: true });
     }
+  },
+  async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await Users.findByIdAndDelete(id);
 
-    response
-      .status(200)
-      .json({ message: "Utilisateur supprimé", user: result });
-  } catch (error) {
-    response.status(500).json({
-      message: "Erreur lors de la suppression de l'utilisateur",
-      error: true,
-    });
+      if (!result) {
+        return response
+          .status(404)
+          .json({ message: "Utilisateur non trouvé", error: true });
+      }
+
+      response
+        .status(200)
+        .json({ message: "Utilisateur supprimé", user: result });
+    } catch (error) {
+      response.status(500).json({
+        message: "Erreur lors de la suppression de l'utilisateur",
+        error: true,
+      });
+    }
   }
-});
+);
 
 // Route pour la connexion ###################################################################################################################################################
 app.post("/api/users/login", async (request, response) => {
