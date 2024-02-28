@@ -111,7 +111,7 @@ function Nutrition() {
           <>
           <div className="d-flex">
             <div className="w-50"><p className="titleNut ms-5">{item.name}</p></div>
-            <div className="nbNutrition">{item.value}</div>
+            <div className="nbNutrition bolder" style={{color: "maroon"}}>{item.value}</div>
           </div><hr />
           </>
         ))}
@@ -125,7 +125,7 @@ function App() {
 
   return (
     <>      
-        <div className="container rounded-5 py-5 my-5" style={{ backgroundColor: "white", width: "60rem" }}>
+        <div className="container rounded-5 py-5 my-5" style={{ backgroundColor: "white", width: "90%" }}>
           <div className="container px-5">
           <img src="./src/assets/images/image-omelette.jpeg" className="img-fluid rounded-5" alt="" />
           {/* ############################################################################################################################################### */}
