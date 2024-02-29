@@ -1,0 +1,16 @@
+.nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav a {
+  color: black;
+}
+
+.selected {
+  text-decoration: underline;
+}
+
+.normal {
+  text-decoration: none;
+}

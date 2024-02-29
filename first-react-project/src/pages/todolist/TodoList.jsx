@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Todo from "../todo/Todo";
-
+import Todo from "../../components/todo/Todo";
 const ToDoList = () => {
   const [todoList, setTodoList] = useState([]);
 
@@ -19,26 +18,28 @@ const ToDoList = () => {
     setTodoList(todoList.filter((oneTodo) => oneTodo !== todo));
   };
   return (
-    <div>
-      <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="todo">Votre todo a ajouter</label>
-        <input type="text" id="todo" name="todo" />
-        <input type="submit" />
-      </form>
-
+    <>
       <div>
-        <h2>Mes choses a faire </h2>
-        {todoList.map((oneTodo) => {
-          return (
-            <Todo
-              key={oneTodo}
-              oneTodo={oneTodo}
-              handleDeleteTodo={handleDeleteTodo}
-            />
-          );
-        })}
+        <form action="" onSubmit={handleSubmit}>
+          <label htmlFor="todo">Votre todo a ajouter</label>
+          <input type="text" id="todo" name="todo" />
+          <input type="submit" />
+        </form>
+
+        <div>
+          <h2>Mes choses a faire </h2>
+          {todoList.map((oneTodo) => {
+            return (
+              <Todo
+                key={oneTodo}
+                oneTodo={oneTodo}
+                handleDeleteTodo={handleDeleteTodo}
+              />
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
