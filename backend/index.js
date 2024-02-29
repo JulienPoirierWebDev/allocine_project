@@ -84,16 +84,39 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  console.log(req.cookies.token);
-  next();
-});
+const authMiddleware = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
 
-app.post("/api/users/lists/movies/add", async (req, res) => {
+    if (!token) {
+      return res.json({ message: "prd d'auth", error: true });
+    }
+
+    const isAuth = await jwt.verify(token, process.env.JWT_SECRET);
+
+    if (isAuth) {
+      const payload = jwt.decode(token);
+      const userId = payload.userId;
+
+      req.userId = userId;
+      next();
+    } else {
+      res.json({ message: "prb auth", error: true });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
   try {
     const bodyWithoutUserId = req.body;
     const userId = req.body.userId;
     delete bodyWithoutUserId.userId;
+
+    if (req.userId !== userId) {
+      return res.json({ message: "pas le bon user auth", error: true });
+    }
 
     const existingMovie = await Movie.findOne({
       TMDBId: req.body.TMDBId,
@@ -160,11 +183,15 @@ app.post("/api/users/lists/movies/add", async (req, res) => {
   }
 });
 
-app.post("/api/users/lists/movies/update", async (req, res) => {
+app.post("/api/users/lists/movies/update", authMiddleware, async (req, res) => {
   try {
     const userId = req.body.userId;
     const TMDBId = Number(req.body.TMDBId);
     const status = req.body.status;
+
+    if (req.userId !== userId) {
+      return res.json({ message: "pas le bon user auth", error: true });
+    }
 
     const movieList = await MovieList.findOne({ userId: userId });
 
@@ -176,7 +203,6 @@ app.post("/api/users/lists/movies/update", async (req, res) => {
     }
 
     const movie = movieList.movies.find((movie) => {
-      console.log(movie.TMDBId, TMDBId);
       return movie.TMDBId === TMDBId;
     });
 
@@ -244,7 +270,6 @@ app.post("/api/users/login", async (req, res) => {
     }
     const isGoodPassword = await bcrypt.compare(password, user.password);
 
-    console.log(isGoodPassword);
     if (!isGoodPassword) {
       return res.json({
         message: "Les identifiants de connexion sont invalides",
@@ -259,9 +284,9 @@ app.post("/api/users/login", async (req, res) => {
         httpOnly: false,
         secure: false,
       })
-      .json({ message: "connexion réussie", error: false, jwt: token });
+      .json({ message: "connexion réussie", error: false });
   } catch (error) {
-    res.json({ message: "oups", error: true });
+    res.json({ message: "oups", error: error });
   }
 });
 
