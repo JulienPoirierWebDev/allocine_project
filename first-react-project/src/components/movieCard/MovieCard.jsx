@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styles from "./MovieCard.module.css";
 
 const MovieCard = ({ title, overview, poster_path }) => {

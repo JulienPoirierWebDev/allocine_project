@@ -1,164 +1,30 @@
-import { useEffect, useState } from "react";
-import MovieCard from "./components/movieCard/MovieCard";
+import { useState } from "react";
+import Products from "./components/products/Products";
+import ListCourse from "./components/listeCourse/ListeCourse";
+import ProfilUtilisateur from "./components/profilUtilisateur/ProfilUtilisateur";
+import Formulaire from "./components/formulaire/Formulaire";
+import SearchMovies from "./components/searchMovies/SearchMovies";
 
-const Todo = ({ oneTodo, handleDeleteTodo, quantity }) => {
-  return (
-    <li>
-      {oneTodo}
-
-      {quantity ? ` - ${quantity}` : null}
-
-      <span style={{ cursor: "pointer" }} onClick={handleDeleteTodo}>
-        X
-      </span>
-    </li>
-  );
-};
-
-const ToDoList = () => {
-  const [todoList, setTodoList] = useState([]);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("coucou");
-    const formData = new FormData(event.target);
-    const newTodo = formData.get("todo").trim();
-    if (newTodo !== "" && !todoList.includes(newTodo)) {
-      setTodoList([...todoList, newTodo]);
-    }
-    event.target.reset();
-  };
-
-  const handleDeleteTodo = (todo) => {
-    setTodoList(todoList.filter((oneTodo) => oneTodo !== todo));
-  };
-  return (
-    <div>
-      <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="todo">Votre todo a ajouter</label>
-        <input type="text" id="todo" name="todo" />
-        <input type="submit" />
-      </form>
-
-      <div>
-        <h2>Mes choses a faire </h2>
-        {todoList.map((oneTodo) => {
-          return (
-            <Todo
-              key={oneTodo}
-              oneTodo={oneTodo}
-              handleDeleteTodo={handleDeleteTodo}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-const ListCourse = () => {
-  const [listeDeCourse, setListDeCourse] = useState([]);
-
-  return (
-    <div>
-      <form
-        action=""
-        onSubmit={(event) => {
-          event.preventDefault();
-          const formData = new FormData(event.target);
-          const course = formData.get("course");
-          const quantity = formData.get("quantity");
-
-          const newItem = {
-            course: course,
-            quantity: quantity,
-          };
-
-          setListDeCourse([...listeDeCourse, newItem]);
-          event.target.reset();
-        }}
-      >
-        <label htmlFor="course">Ajouter un produit</label>
-        <input type="text" name="course" id="course" />
-        <label htmlFor="quantity">Combien ?</label>
-        <input type="number" name="quantity" id="quantity" />
-        <input type="submit" />
-      </form>
-
-      {listeDeCourse.length > 0 ? (
-        <div>
-          <h2>Ma liste de course</h2>
-          {listeDeCourse.map((produit) => {
-            return (
-              <Todo
-                key={produit.course}
-                oneTodo={produit.course}
-                quantity={produit.quantity}
-                handleDeleteTodo={() => {
-                  const newListDeCourse = listeDeCourse.filter((oneCourse) => {
-                    if (oneCourse.course !== produit.course) {
-                      return oneCourse;
-                    }
-                  });
-
-                  setListDeCourse(newListDeCourse);
-                }}
-              />
-            );
-          })}
-        </div>
-      ) : null}
-    </div>
-  );
-};
 function App() {
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState("searchPage");
   return (
     <>
-      <div
-        style={{ display: "flex", justifyContent: "center", margin: "20px" }}
-      >
-        <form
-          action=""
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const search = formData.get("search");
-
-            setIsLoading(true);
-            const request = await fetch(
-              `http://allocine.julienpoirier-webdev.com/api/movies/search_by_name?name=${search}`
-            );
-
-            const data = await request.json();
-            setMovies(data.data.results);
-            setIsLoading(false);
-          }}
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          <label htmlFor="search" style={{ marginRight: "10px" }}>
-            Votre recherche
-          </label>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            style={{ marginRight: "10px" }}
-          />
-          <input type="submit" value="Rechercher" />
-        </form>
-      </div>
-
       <div>
-        {isLoading
-          ? "loading"
-          : movies.map((movie) => {
-              return <MovieCard key={movie.id} {...movie} />;
-            })}
+        <p onClick={() => setPage("searchPage")}>Search</p>
+        <p onClick={() => setPage("productsPage")}>Products</p>
+        <p onClick={() => setPage("listCoursePage")}>Liste Course</p>
+        <p onClick={() => setPage("profilUtilisateurPage")}>
+          Profil Utilisateur
+        </p>
+        <p onClick={() => setPage("formulairePage")}>Formulaire</p>
       </div>
+
+      {page === "searchPage" ? <SearchMovies /> : null}
+      {page === "productsPage" ? <Products /> : null}
+      {page === "listCoursePage" ? <ListCourse /> : null}
+      {page === "profilUtilisateurPage" ? <ProfilUtilisateur /> : null}
+      {page === "formulairePage" ? <Formulaire /> : null}
       {/* <Products />
-      <ToDoList />
       <ListCourse />
       <ProfilUtilisateur />
       <Formulaire /> */}
@@ -166,142 +32,4 @@ function App() {
   );
 }
 
-const Products = () => {
-  const [apiData, setApiData] = useState(null);
-  const [panier, setPanier] = useState([]);
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const request = await fetch(
-          "https://passerelle-shop-api.julienpoirier-webdev.com/products"
-        );
-
-        const data = await request.json();
-        setApiData(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getData();
-  }, []);
-  return (
-    <>
-      {apiData ? (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          {apiData.map((product) => {
-            return (
-              <div
-                key={product._id}
-                style={{
-                  border: "2px solid black",
-                  margin: "5px",
-                  padding: "20px",
-                  width: "200px",
-                }}
-              >
-                <div>
-                  <h1 style={{ fontSize: "16px" }}>{product.name}</h1>
-                  <p>{product.description}</p>
-                  <h3>{product.price} €</h3>
-                </div>
-                <div>
-                  <img
-                    style={{ width: "100%", minWidth: "100px" }}
-                    src={product.mainImageURL}
-                    alt=""
-                  />
-                </div>
-                <button onClick={() => {}}>Acheter</button>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
-    </>
-  );
-};
-
-const ProfilUtilisateur = () => {
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    console.log("Je suis le message au montage du composant");
-    const storedName = localStorage.getItem("nameOfMyUser");
-    setName(storedName);
-
-    return () => {
-      console.log("Je suis le message au démontage du composant");
-    };
-  }, []);
-
-  useEffect(() => {
-    if (name !== "") {
-      localStorage.setItem("nameOfMyUser", name);
-    }
-  }, [name]);
-  return (
-    <div>
-      <form action="">
-        <label htmlFor="name-user">Votre nom</label>
-        <input
-          type="text"
-          name="name-user"
-          id="name-user"
-          onChange={(e) => setName(e.target.value)}
-        />
-      </form>
-      <p>{name ? `Hello ${name}` : "Hello Stranger"}</p>
-    </div>
-  );
-};
-
-const Formulaire = () => {
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [error, setError] = useState("");
-  return (
-    <div>
-      <form action="">
-        <div>
-          <label htmlFor="name">Votre nom</label>
-          <input type="text" name="name" id="name" />
-        </div>
-        <div>
-          <label htmlFor="password">Mot de passe</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="password-confirm">Confirmation du mot de passe</label>
-          <input
-            type="password"
-            name="password-confirm"
-            id="password-confirm"
-            onChange={(e) => {
-              setPasswordConfirm(e.target.value);
-              if (password !== "" && password !== e.target.value) {
-                setError("Les mots de passe ne correspondent pas");
-              } else {
-                setError("");
-              }
-            }}
-          />
-        </div>
-        {error !== "" ? error : null}
-        <input type="submit" value="Connexion" />
-      </form>
-    </div>
-  );
-};
 export default App;
