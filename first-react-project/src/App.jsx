@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MovieCard from "./components/movieCard/MovieCard";
 
 const Todo = ({ oneTodo, handleDeleteTodo, quantity }) => {
   return (
@@ -111,24 +112,50 @@ const ListCourse = () => {
   );
 };
 function App() {
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <>
-      <div>
+      <div
+        style={{ display: "flex", justifyContent: "center", margin: "20px" }}
+      >
         <form
           action=""
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            // utiliser ce qui est dans search
-            //pour rechercher des films sur
-            //http://localhost:3000/api/movies/search_by_name
-            //http://localhost:3000/api/movies/search_by_name?name=XXXX
-            // sauvegarder les films dans un useState
+            const formData = new FormData(e.target);
+            const search = formData.get("search");
+
+            setIsLoading(true);
+            const request = await fetch(
+              `http://allocine.julienpoirier-webdev.com/api/movies/search_by_name?name=${search}`
+            );
+
+            const data = await request.json();
+            setMovies(data.data.results);
+            setIsLoading(false);
           }}
+          style={{ display: "flex", alignItems: "center" }}
         >
-          <label htmlFor="search">Votre recherche</label>
-          <input type="text" name="search" id="search" />
-          <input type="submit" />
+          <label htmlFor="search" style={{ marginRight: "10px" }}>
+            Votre recherche
+          </label>
+          <input
+            type="text"
+            name="search"
+            id="search"
+            style={{ marginRight: "10px" }}
+          />
+          <input type="submit" value="Rechercher" />
         </form>
+      </div>
+
+      <div>
+        {isLoading
+          ? "loading"
+          : movies.map((movie) => {
+              return <MovieCard key={movie.id} {...movie} />;
+            })}
       </div>
       {/* <Products />
       <ToDoList />
