@@ -40,7 +40,7 @@ function App() {
   ];
   
   //Début exercice api figurine
- const[myApi,setmyApi] = useState();
+ //const[myApi,setmyApi] = useState();
  //Essai que je comprends pas. hahaha
  /*useEffect(() => {
   fetch("https://passerelle-shop-api.julienpoirier-webdev.com/products")
@@ -48,6 +48,7 @@ function App() {
     .then((json) => setmyApi(json));
  }, []);
 */
+/*
 useEffect(() => {
   const getData = async () => {
     try {
@@ -64,6 +65,8 @@ useEffect(() => {
 
   getData();
 })
+
+*/
   return (
     <div
       style={{
