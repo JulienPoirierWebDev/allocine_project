@@ -111,25 +111,33 @@ const ListCourse = () => {
   );
 };
 function App() {
+  const [dataSet, setDataset] = useState(null);
+  function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const search = formData.get("search");
+
+    fetch(
+      `http://allocine.julienpoirier-webdev.com/api/movies/search_by_name?name=${search}`
+    )
+      .then((response) => response.json())
+      .then((data) => setDataset(data));
+    console.log(dataSet);
+    dataSet.map((dataOneSet) => {
+      console.log(dataOneSet);
+    });
+  }
+
   return (
     <>
       <div>
-        <form
-          action=""
-          onSubmit={(e) => {
-            e.preventDefault();
-            // utiliser ce qui est dans search
-            //pour rechercher des films sur
-            //http://localhost:3000/api/movies/search_by_name
-            //http://localhost:3000/api/movies/search_by_name?name=XXXX
-            // sauvegarder les films dans un useState
-          }}
-        >
+        <form action="" onSubmit={handleSubmit}>
           <label htmlFor="search">Votre recherche</label>
           <input type="text" name="search" id="search" />
-          <input type="submit" />
+          <input type="submit" name="submit" />
         </form>
       </div>
+      {/* {dataSet ? <p>{dataSet.data.results[0].title}</p> : "nope"} */}
       {/* <Products />
       <ToDoList />
       <ListCourse />
