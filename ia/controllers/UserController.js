@@ -1,5 +1,7 @@
 const User = require("../models/UserModel");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (request, response) => {
   try {
@@ -19,11 +21,13 @@ const createUser = async (request, response) => {
         error: true,
       });
     }
+    console.log(request.body.password);
+    const hashedPassword = await bcrypt.hash(request.body.password, 12);
 
     const newUser = new User({
       name: request.body.name,
       email: request.body.email,
-      password: request.body.password,
+      password: hashedPassword,
     });
 
     newUser.save();
@@ -142,11 +146,49 @@ const deleteUserById = async (request, response) => {
       });
     }
 
+    const userToDelete = await User.find({ _id: id });
+
+    if (request.email !== userToDelete.email) {
+      return response.json({ message: "pas le bon email" });
+    }
+
     await User.deleteOne({ _id: id });
 
     response.json({ message: "Utilisateur supprimé", error: false });
   } catch (error) {
     response.status(500).json({ message: "Oups", error: true });
+  }
+};
+
+const login = async (request, response) => {
+  const password = request.body.password;
+  const email = request.body.email;
+
+  const existingUser = await User.findOne({ email: email });
+
+  if (!existingUser) {
+    return response
+      .status(404)
+      .json({ message: "bad credentials", error: true });
+  }
+
+  const isGoodPassword = await bcrypt.compare(password, existingUser.password);
+
+  if (isGoodPassword) {
+    const myToken = jwt.sign(
+      { email: existingUser.email },
+      process.env.SECRET_JWT,
+      {
+        expiresIn: "24h",
+      }
+    );
+    response.json({
+      message: "Bon mot de passe :)",
+      jwt: myToken,
+      error: false,
+    });
+  } else {
+    response.status(404).json({ message: "bad credentials", error: true });
   }
 };
 
@@ -156,4 +198,5 @@ module.exports = {
   getOneUserById,
   modifyUserById,
   deleteUserById,
+  login,
 };

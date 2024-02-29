@@ -1,22 +1,17 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 
 const User = require("./models/UserModel");
 
-const {
-  createUser,
-  getAllUsers,
-  getOneUserById,
-  modifyUserById,
-  deleteUserById,
-} = require("./controllers/UserController");
+const usersRouter = require("./routers/userRouter");
 
 const app = express();
 
 const dbConnexion = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://julienpoirier17:1234@teachingcluster.rylpson.mongodb.net/crud-mongoose"
+      `mongodb+srv://${process.env.USERNAME_MONGO}:${process.env.PASSWORD_MONGO}@teachingcluster.rylpson.mongodb.net/crud-mongoose`
     );
 
     console.log("DB connexion succed");
@@ -33,19 +28,11 @@ app.use(express.json());
 // accepter les données issues des formulaires HTML
 app.use(express.urlencoded({ extended: false }));
 
-app.post("/api/users", createUser);
+app.use("/api/users", usersRouter);
 
-app.get("/api/users", getAllUsers);
-
-app.get("/api/users/:id", getOneUserById);
-
-app.put("/api/users/", modifyUserById);
-
-app.delete("/api/users/:id", deleteUserById);
-
-app.listen("3001", (err) => {
+app.listen(process.env.PORT, (err) => {
   if (err) {
     console.log(err);
   }
-  console.log("Serveur lancé sur le port 3001");
+  console.log(`Serveur lancé sur le port ${process.env.PORT}`);
 });
