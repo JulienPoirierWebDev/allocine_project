@@ -111,6 +111,35 @@ const ListCourse = () => {
   );
 };
 function App() {
+  return (
+    <>
+      <div>
+        <form
+          action=""
+          onSubmit={(e) => {
+            e.preventDefault();
+            // utiliser ce qui est dans search
+            //pour rechercher des films sur
+            //http://localhost:3000/api/movies/search_by_name
+            //http://localhost:3000/api/movies/search_by_name?name=XXXX
+            // sauvegarder les films dans un useState
+          }}
+        >
+          <label htmlFor="search">Votre recherche</label>
+          <input type="text" name="search" id="search" />
+          <input type="submit" />
+        </form>
+      </div>
+      {/* <Products />
+      <ToDoList />
+      <ListCourse />
+      <ProfilUtilisateur />
+      <Formulaire /> */}
+    </>
+  );
+}
+
+const Products = () => {
   const [apiData, setApiData] = useState(null);
   const [panier, setPanier] = useState([]);
   useEffect(() => {
@@ -168,13 +197,9 @@ function App() {
           })}
         </div>
       ) : null}
-      <ToDoList />
-      <ListCourse />
-      <ProfilUtilisateur />
-      <Formulaire />
     </>
   );
-}
+};
 
 const ProfilUtilisateur = () => {
   const [name, setName] = useState("");
