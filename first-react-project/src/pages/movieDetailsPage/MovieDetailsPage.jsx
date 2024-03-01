@@ -1,13 +1,11 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import MovieDetails from "../../components/movieDetails/MovieDetails";
 
 // import { Container } from './styles';
 
 function MovieDetailsPage() {
-  const { id } = useParams();
   return (
     <>
-      <p>Vous recherchez le film avec l'id {id}</p>
+      <MovieDetails />
     </>
   );
 }

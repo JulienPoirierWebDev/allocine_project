@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 
-const MovieCard = ({ title, overview, poster_path, id }) => {
+const MovieCard = ({ title, overview, poster_path, id, search }) => {
   return (
     <div className={styles.movie}>
       <img
@@ -14,7 +14,9 @@ const MovieCard = ({ title, overview, poster_path, id }) => {
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.description}>{overview}</p>
       </div>
-      <Link to={`/movie-details/${id}`}>En savoir plus</Link>
+      <Link to={`/movie-details/${id}`} state={{ search: search }}>
+        En savoir plus
+      </Link>
     </div>
   );
 };
