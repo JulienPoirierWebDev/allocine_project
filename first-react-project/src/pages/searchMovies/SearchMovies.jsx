@@ -18,7 +18,7 @@ const SearchMovies = () => {
 
             setIsLoading(true);
             const request = await fetch(
-              `http://allocine.julienpoirier-webdev.com/api/movies/search_by_name?name=${search}`
+              `https://allocine.julienpoirier-webdev.com/api/movies/search_by_name?name=${search}`
             );
 
             const data = await request.json();

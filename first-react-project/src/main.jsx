@@ -10,6 +10,7 @@ import ProfilUtilisateur from "./pages/profilUtilisateur/ProfilUtilisateur.jsx";
 import SearchMovies from "./pages/searchMovies/SearchMovies.jsx";
 import Products from "./pages/products/Products.jsx";
 import ListCourse from "./pages/listeCourse/ListeCourse.jsx";
+import MovieDetailsPage from "./pages/movieDetailsPage/MovieDetailsPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "/searchMovie",
         element: <SearchMovies />,
+      },
+      {
+        path: "/movie-details/:id",
+        element: <MovieDetailsPage />,
       },
       {
         path: "/formulaire",
