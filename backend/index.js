@@ -359,5 +359,5 @@ app.get("/api/films/search_by_criterias", async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log("Server started");
+  console.log("Server started (3000)");
 });
