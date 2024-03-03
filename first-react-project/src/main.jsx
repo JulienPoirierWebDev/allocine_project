@@ -11,6 +11,8 @@ import SearchMovies from "./pages/searchMovies/SearchMovies.jsx";
 import Products from "./pages/products/Products.jsx";
 import ListCourse from "./pages/listeCourse/ListeCourse.jsx";
 import MovieDetailsPage from "./pages/movieDetailsPage/MovieDetailsPage.jsx";
+import LoginPage from "./pages/loginPage/LoginPage.jsx";
+import RegisterPage from "./pages/registerPage/RegisterPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
       </div>
     ),
     children: [
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
       {
         path: "/searchMovie",
         element: <SearchMovies />,

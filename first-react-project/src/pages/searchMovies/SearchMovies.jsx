@@ -1,14 +1,33 @@
 import { useEffect, useState } from "react";
 import MovieCard from "../../components/movieCard/MovieCard";
 import { useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const SearchMovies = () => {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const { state } = useLocation();
+  const [userId, setUserId] = useState(null);
+  const [userList, setUserList] = useState([]);
+
+  const handleUpdateUserList = async () => {
+    const resquest = await fetch(
+      `http://localhost:3000/api/users/${userId}/lists/`
+    );
+
+    const data = await resquest.json();
+    if (!data.error) {
+      setUserList(data.data.movies);
+    }
+  };
 
   useEffect(() => {
+    const cookieElement = Cookies.get("userId");
+    if (cookieElement) {
+      const userId = cookieElement.slice(3, cookieElement.length - 1);
+      setUserId(userId);
+    }
     if (state && state.search) {
       setSearch(state.search);
 
@@ -25,6 +44,23 @@ const SearchMovies = () => {
       };
 
       getData();
+    }
+
+    if (userId) {
+      const getUserList = async () => {
+        const resquest = await fetch(
+          `http://localhost:3000/api/users/${userId}/lists/`
+        );
+
+        const data = await resquest.json();
+        if (!data.error) {
+          setUserList(data.data.movies);
+        }
+      };
+
+      if (userId) {
+        getUserList();
+      }
     }
   }, []);
 
@@ -70,7 +106,18 @@ const SearchMovies = () => {
         {isLoading
           ? "loading"
           : movies.map((movie) => {
-              return <MovieCard key={movie.id} {...movie} search={search} />;
+              return (
+                <MovieCard
+                  key={movie.id}
+                  {...movie}
+                  search={search}
+                  userId={userId}
+                  isInUserList={userList.some(
+                    (userMovie) => userMovie.TMDBId === movie.id
+                  )}
+                  updateUserList={handleUpdateUserList}
+                />
+              );
             })}
       </div>
     </>

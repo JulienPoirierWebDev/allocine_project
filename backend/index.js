@@ -52,6 +52,11 @@ const movieListSchema = new mongoose.Schema({
       id: { type: mongoose.Schema.Types.ObjectId, ref: "Movie" },
       status: { type: String, enum: ["vu", "a voir"] },
       TMDBId: Number,
+      title: String,
+      date: String,
+      poster: String,
+      description: String,
+      rating: Number,
     },
   ],
 });
@@ -67,6 +72,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     credentials: true,
+    origin: ["http://localhost:5173", "https://allocine-project.vercel.app/"],
   })
 );
 
@@ -107,11 +113,38 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+app.get("/api/users/:userId/lists", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User({ _id: userId });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "L'utilisateur n'existe pas",
+        error: true,
+      });
+    }
+
+    const movieList = await MovieList.findOne({ userId: userId });
+
+    if (!movieList) {
+      return res.status(400).json({
+        message: "La liste de l'utilisateur n'existe pas",
+        error: true,
+      });
+    }
+
+    res.json({ message: "ok", data: movieList });
+  } catch (error) {
+    res.json({ message: "oups", error: true });
+  }
+});
+
 app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
   try {
     const bodyWithoutUserId = req.body;
     const userId = req.body.userId;
-    delete bodyWithoutUserId.userId;
 
     if (req.userId !== userId) {
       return res.json({ message: "pas le bon user auth", error: true });
@@ -121,9 +154,19 @@ app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
       TMDBId: req.body.TMDBId,
     });
 
-    const newMovie = new Movie(bodyWithoutUserId);
-
+    let newMovieId = null;
     if (!existingMovie) {
+      const newMovie = new Movie({
+        TMDBId: bodyWithoutUserId.TMDBId,
+        title: bodyWithoutUserId.title,
+        date: bodyWithoutUserId.release_date,
+        poster: bodyWithoutUserId.poster_path,
+        description: bodyWithoutUserId.overview,
+        rating: bodyWithoutUserId.vote_average,
+      });
+
+      newMovieId = newMovie._id;
+
       await newMovie.save();
     }
 
@@ -134,9 +177,14 @@ app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
         userId: userId,
         movies: [
           {
-            id: existingMovie ? existingMovie._id : newMovie._id,
+            id: existingMovie ? existingMovie._id : newMovieId,
             status: "a voir",
-            TMDBId: req.body.TMDBId,
+            poster: bodyWithoutUserId.poster_path,
+            title: bodyWithoutUserId.title,
+            date: bodyWithoutUserId.release_date,
+            description: bodyWithoutUserId.overview,
+            rating: bodyWithoutUserId.vote_average,
+            TMDBId: bodyWithoutUserId.TMDBId,
           },
         ],
       });
@@ -152,11 +200,11 @@ app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
         data: newMovieList,
       });
     }
-
+    console.log("heere");
     const existingMovieInList = movieList.movies.find(
       (movie) =>
         movie.id.toString() ===
-        (existingMovie ? existingMovie._id : newMovie._id).toString()
+        (existingMovie ? existingMovie._id : newMovieId).toString()
     );
 
     if (existingMovieInList) {
@@ -166,9 +214,16 @@ app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
       });
     }
 
+    console.log(newMovieId, "newMovieId");
     movieList.movies.push({
-      id: existingMovie ? existingMovie._id : newMovie._id,
+      id: existingMovie ? existingMovie._id : newMovieId,
       status: "a voir",
+      poster: bodyWithoutUserId.poster_path,
+      title: bodyWithoutUserId.title,
+      date: bodyWithoutUserId.release_date,
+      description: bodyWithoutUserId.overview,
+      rating: bodyWithoutUserId.vote_average,
+      TMDBId: bodyWithoutUserId.TMDBId.toString(),
     });
 
     await movieList.save();
@@ -178,6 +233,7 @@ app.post("/api/users/lists/movies/add", authMiddleware, async (req, res) => {
       data: movieList,
     });
   } catch (error) {
+    // console.log(error);
     res.json({ message: "oups", error: true });
   }
 });
@@ -283,9 +339,41 @@ app.post("/api/users/login", async (req, res) => {
         httpOnly: false,
         secure: false,
       })
+      .cookie("userId", user._id, {
+        httpOnly: false,
+        secure: false,
+      })
       .json({ message: "connexion réussie", error: false });
   } catch (error) {
     res.json({ message: "oups", error: error });
+  }
+});
+
+app.get("/api/movies/details/:idMovie", async (req, res) => {
+  try {
+    const idMovie = req.params.idMovie;
+
+    const token =
+      "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YTlhMWJjNTE0ZDFkOWY0N2YwYzkzMzQwMjI1ZDdmYyIsInN1YiI6IjY0MmMxMWE0MDFiMWNhMDExM2NkMjdhYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1ZDuqbmd4MPWDN5VxLjTn8-2J7ek_SdTT96KNSQ4ZjI";
+
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const request = await fetch(
+      `https://api.themoviedb.org/3/movie/${idMovie}?language=fr-FR'`,
+      options
+    );
+
+    const data = await request.json();
+
+    res.json({ message: "ok", data: data });
+  } catch (error) {
+    res.json({ message: "oups", error: true });
   }
 });
 
